@@ -17,7 +17,10 @@ The main goal of this system is to streamline teamwork for complex university su
 **Backend:** Django REST Framework (Relational models, Token-based Auth, CRUD).
 **API:** Handled with Angular Services and HttpClient.
    ## Group Members
- **Mariya Ganibek** 
+ **Mariya Ganibek**
   **Elip Makpal**
   **Gizatulina Ayaulym**
+  
+ 
+
  
