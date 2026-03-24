@@ -8,9 +8,9 @@ The main goal of this system is to streamline teamwork for complex university su
 
 ### Key Features
 **Project Planning:** Create dedicated workspaces for different group assignments.
-**Work Tracking:** Monitor the progress of every task from initial idea to final submission.
-**Resource Management:** Assign specific responsibilities to team members.
-**Team Communication:** Discuss technical details directly within task cards via comments.
+* **Work Tracking:** Monitor the progress of every task from initial idea to final submission.
+* **Resource Management:** Assign specific responsibilities to team members.
+* **Team Communication:** Discuss technical details directly within task cards via comments.
 
 ### Technical Stack
 **Frontend:** Angular 17+ (Reactive UI, JWT Authentication, @if/@for directives).
@@ -18,6 +18,6 @@ The main goal of this system is to streamline teamwork for complex university su
 **API:** Handled with Angular Services and HttpClient.
    ## Group Members
  **Mariya Ganibek** 
- ***Elip Makpal**
- ***Gizatulina Ayaulym**
+ * **Elip Makpal**
+ * **Gizatulina Ayaulym**
  
