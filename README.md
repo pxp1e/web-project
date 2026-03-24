@@ -18,6 +18,6 @@ The main goal of this system is to streamline teamwork for complex university su
 **API:** Handled with Angular Services and HttpClient.
    ## Group Members
  **Mariya Ganibek** 
- **Elip Makpal**
- **Gizatulina Ayaulym**
+ ***Elip Makpal**
+ ***Gizatulina Ayaulym**
  
