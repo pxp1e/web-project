@@ -1,59 +1,31 @@
-# Frontend
+# web-project
+# Academic Task Management System
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+### Project Description
+Our project is a professional task management platform designed to help student teams **plan, organize, manage, and track their work**. Inspired by industry standards, this application focuses on **Academic Project Management**, providing a structured environment for university collaboration.
 
-## Development server
+The main goal of this system is to streamline teamwork for complex university subjects such as **Web Development, Calculus, and Physics**. Instead of using scattered messages, teams can centralize their workflow in one secure application.
 
-To start a local development server, run:
+### Key Features
+**Project Planning:** Create dedicated workspaces for different group assignments.
 
-```bash
-ng serve
-```
+**Work Tracking:** Monitor the progress of every task from initial idea to final submission.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+**Resource Management:** Assign specific responsibilities to team members.
 
-## Code scaffolding
+**Team Communication:** Discuss technical details directly within task cards via comments.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Technical Stack
+**Frontend:** Angular 17+ (Reactive UI, JWT Authentication, @if/@for directives).
+**Backend:** Django REST Framework (Relational models, Token-based Auth, CRUD).
+**API:** Handled with Angular Services and HttpClient.
+   ## Group Members
+ **Ganibek Mariya**
+ 
+ **Elip Makpal**
+ 
+ **Gizatulina Ayaulym**
+  
+ 
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+ 
