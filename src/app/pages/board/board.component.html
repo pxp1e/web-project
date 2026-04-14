@@ -1,0 +1,101 @@
+<div class="page-layout">
+  <nav class="sidebar">
+    <div class="sidebar-logo">📋 TaskBoard</div>
+    <ul class="nav-links">
+      <li><a routerLink="/dashboard">🏠 Dashboard</a></li>
+      <li><a routerLink="/teams" class="active">👥 Teams</a></li>
+      <li><a routerLink="/subjects">📚 Subjects</a></li>
+    </ul>
+  </nav>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Team Board</h1>
+      <a routerLink="/teams" class="btn-secondary">← Back to Teams</a>
+    </div>
+
+    <div *ngIf="error" class="error-msg">{{ error }}</div>
+
+    <div class="create-task-form">
+      <h3>New Task</h3>
+      <div class="form-row">
+        <input [(ngModel)]="newTask.title" name="title" placeholder="Task title" class="input-field" />
+        <select [(ngModel)]="newTask.priority" name="priority" class="input-field select-small">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+        <input [(ngModel)]="newTask.deadline" name="deadline" type="date" class="input-field select-small" />
+        <button (click)="createTask()" class="btn-primary">+ Add Task</button>
+      </div>
+      <textarea [(ngModel)]="newTask.description" name="description" placeholder="Description (optional)" class="input-field textarea"></textarea>
+    </div>
+
+    <div class="kanban-board">
+      @for (col of columns; track col) {
+        <div class="kanban-column">
+          <div class="column-header">{{ columnLabels[col] }}</div>
+          <div class="column-tasks">
+            @for (task of getTasksByStatus(col); track task.id) {
+              <div class="task-card" (click)="openTask(task)">
+                <div class="task-title">{{ task.title }}</div>
+                <div class="task-meta">
+                  <span class="badge priority-{{ task.priority }}">{{ task.priority }}</span>
+                  <span *ngIf="task.deadline" class="deadline">📅 {{ task.deadline }}</span>
+                </div>
+                <div *ngIf="task.assigned_to" class="assigned">
+                  👤 {{ task.assigned_to.username }}
+                </div>
+                <div class="task-actions" (click)="$event.stopPropagation()">
+                  @for (s of columns; track s) {
+                    @if (s !== col) {
+                      <button class="move-btn" (click)="moveTask(task, s)">→ {{ s }}</button>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </main>
+</div>
+
+<div *ngIf="showModal && selectedTask" class="modal-overlay" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ selectedTask.title }}</h2>
+      <button (click)="closeModal()" class="close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>{{ selectedTask.description }}</p>
+      <div class="task-details">
+        <span class="badge status-{{ selectedTask.status }}">{{ selectedTask.status }}</span>
+        <span class="badge priority-{{ selectedTask.priority }}">{{ selectedTask.priority }}</span>
+        <span *ngIf="selectedTask.deadline">📅 {{ selectedTask.deadline }}</span>
+      </div>
+
+      <h3>Comments</h3>
+      <div class="comments-list">
+        @for (comment of selectedTask.comments; track comment.id) {
+          <div class="comment">
+            <strong>{{ comment.author.username }}</strong>
+            <span class="comment-text">{{ comment.text }}</span>
+            <span class="comment-time">{{ comment.created_at | date:'short' }}</span>
+          </div>
+        }
+        @if (selectedTask.comments.length === 0) {
+          <p class="empty-state">No comments yet</p>
+        }
+      </div>
+
+      <div class="add-comment">
+        <textarea [(ngModel)]="newComment" placeholder="Add a comment..." class="input-field textarea"></textarea>
+        <button (click)="addComment()" class="btn-primary">Post Comment</button>
+      </div>
+
+      <button (click)="deleteTask(selectedTask.id)" class="btn-danger">Delete Task</button>
+    </div>
+  </div>
+</div>
