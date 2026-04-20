@@ -1,0 +1,339 @@
+{
+  "info": {
+    "name": "StudentTaskBoard API",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "description": "Full API collection for StudentTaskBoard",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api", "type": "string" },
+    { "key": "access_token", "value": "", "type": "string" },
+    { "key": "refresh_token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [{ "listen": "test", "script": { "exec": ["var json = pm.response.json(); if (json.access) { pm.collectionVariables.set('access_token', json.access); pm.collectionVariables.set('refresh_token', json.refresh); }"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/register/", "host": ["{{base_url}}"], "path": ["auth", "register", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"mariya\",\n  \"password\": \"pass1234\",\n  \"email\": \"mariya@kbtu.kz\",\n  \"first_name\": \"Mariya\",\n  \"last_name\": \"Ganibek\"\n}" }
+          },
+          "response": [{ "name": "201 Created", "status": "Created", "code": 201, "_postman_previewlanguage": "json", "body": "{\n  \"access\": \"eyJ...\",\n  \"refresh\": \"eyJ...\",\n  \"user\": { \"id\": 1, \"username\": \"mariya\" }\n}" }]
+        },
+        {
+          "name": "Login",
+          "event": [{ "listen": "test", "script": { "exec": ["var json = pm.response.json(); if (json.access) { pm.collectionVariables.set('access_token', json.access); pm.collectionVariables.set('refresh_token', json.refresh); }"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/login/", "host": ["{{base_url}}"], "path": ["auth", "login", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"mariya\",\n  \"password\": \"pass1234\"\n}" }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{\n  \"access\": \"eyJ...\",\n  \"refresh\": \"eyJ...\",\n  \"user\": { \"id\": 1, \"username\": \"mariya\" }\n}" }, { "name": "401 Invalid", "status": "Unauthorized", "code": 401, "_postman_previewlanguage": "json", "body": "{ \"error\": \"Invalid credentials\" }" }]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/logout/", "host": ["{{base_url}}"], "path": ["auth", "logout", ""] },
+            "body": { "mode": "raw", "raw": "{ \"refresh\": \"{{refresh_token}}\" }" }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{ \"message\": \"Logged out successfully\" }" }]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/refresh/", "host": ["{{base_url}}"], "path": ["auth", "refresh", ""] },
+            "body": { "mode": "raw", "raw": "{ \"refresh\": \"{{refresh_token}}\" }" }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{ \"access\": \"eyJ...new_token\" }" }]
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/dashboard/stats/", "host": ["{{base_url}}"], "path": ["dashboard", "stats", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{\n  \"total\": 8,\n  \"todo\": 3,\n  \"in_progress\": 2,\n  \"review\": 1,\n  \"done\": 2,\n  \"overdue\": 1\n}" }]
+        },
+        {
+          "name": "Get My Tasks",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/tasks/my/", "host": ["{{base_url}}"], "path": ["tasks", "my", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "[\n  {\n    \"id\": 1,\n    \"title\": \"Implement login page\",\n    \"status\": \"in_progress\",\n    \"priority\": \"high\",\n    \"deadline\": \"2026-04-21\"\n  }\n]" }]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Search Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/users/search/?q=mar", "host": ["{{base_url}}"], "path": ["users", "search", ""], "query": [{ "key": "q", "value": "mar" }] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "[\n  { \"id\": 2, \"username\": \"marmar\", \"first_name\": \"Mariam\", \"last_name\": \"Bekova\" }\n]" }]
+        }
+      ]
+    },
+    {
+      "name": "Subjects",
+      "item": [
+        {
+          "name": "Get All Subjects",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/subjects/", "host": ["{{base_url}}"], "path": ["subjects", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "[\n  { \"id\": 1, \"name\": \"Web Development\", \"code\": \"INFT2205\", \"semester\": 4, \"is_system\": true }\n]" }]
+        },
+        {
+          "name": "Create Subject",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/subjects/", "host": ["{{base_url}}"], "path": ["subjects", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Mobile Development\",\n  \"code\": \"CS401\",\n  \"semester\": 6\n}" }
+          },
+          "response": [{ "name": "201 Created", "status": "Created", "code": 201, "_postman_previewlanguage": "json", "body": "{ \"id\": 11, \"name\": \"Mobile Development\", \"code\": \"CS401\", \"semester\": 6 }" }]
+        },
+        {
+          "name": "Delete Subject",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/subjects/11/", "host": ["{{base_url}}"], "path": ["subjects", "11", ""] }
+          },
+          "response": [{ "name": "204 No Content", "status": "No Content", "code": 204, "_postman_previewlanguage": "json", "body": "" }, { "name": "403 System Subject", "status": "Forbidden", "code": 403, "_postman_previewlanguage": "json", "body": "{ \"error\": \"Cannot delete system subject\" }" }]
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "item": [
+        {
+          "name": "Get All Teams",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/teams/", "host": ["{{base_url}}"], "path": ["teams", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Web Dev Team\",\n    \"subject_name\": \"Web Development\",\n    \"member_count\": 3,\n    \"my_role\": \"admin\"\n  }\n]" }]
+        },
+        {
+          "name": "Create Team",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/teams/", "host": ["{{base_url}}"], "path": ["teams", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Web Dev Team\",\n  \"subject\": 1\n}" }
+          },
+          "response": [{ "name": "201 Created", "status": "Created", "code": 201, "_postman_previewlanguage": "json", "body": "{ \"id\": 1, \"name\": \"Web Dev Team\", \"my_role\": \"admin\" }" }]
+        },
+        {
+          "name": "Delete Team",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/teams/1/", "host": ["{{base_url}}"], "path": ["teams", "1", ""] }
+          },
+          "response": [{ "name": "204 No Content", "status": "No Content", "code": 204, "_postman_previewlanguage": "json", "body": "" }, { "name": "403 Not Admin", "status": "Forbidden", "code": 403, "_postman_previewlanguage": "json", "body": "{ \"error\": \"Only admin can delete team\" }" }]
+        },
+        {
+          "name": "Add Member",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/teams/1/members/", "host": ["{{base_url}}"], "path": ["teams", "1", "members", ""] },
+            "body": { "mode": "raw", "raw": "{ \"username\": \"marmar\" }" }
+          },
+          "response": [{ "name": "201 Created", "status": "Created", "code": 201, "_postman_previewlanguage": "json", "body": "{ \"id\": 1, \"name\": \"Web Dev Team\", \"memberships\": [] }" }, { "name": "404 Not Found", "status": "Not Found", "code": 404, "_postman_previewlanguage": "json", "body": "{ \"error\": \"User not found\" }" }]
+        },
+        {
+          "name": "Remove Member",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/teams/1/members/", "host": ["{{base_url}}"], "path": ["teams", "1", "members", ""] },
+            "body": { "mode": "raw", "raw": "{ \"user_id\": 2 }" }
+          },
+          "response": [{ "name": "204 No Content", "status": "No Content", "code": 204, "_postman_previewlanguage": "json", "body": "" }]
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/tasks/", "host": ["{{base_url}}"], "path": ["tasks", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "[...]" }]
+        },
+        {
+          "name": "Get Tasks by Team",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/tasks/?team_id=1", "host": ["{{base_url}}"], "path": ["tasks", ""], "query": [{ "key": "team_id", "value": "1" }] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "[...]" }]
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/tasks/", "host": ["{{base_url}}"], "path": ["tasks", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Implement login page\",\n  \"description\": \"Create Angular login component\",\n  \"status\": \"todo\",\n  \"priority\": \"high\",\n  \"deadline\": \"2026-04-21\",\n  \"team\": 1,\n  \"assigned_to_id\": 2\n}" }
+          },
+          "response": [{ "name": "201 Created", "status": "Created", "code": 201, "_postman_previewlanguage": "json", "body": "{ \"id\": 1, \"title\": \"Implement login page\", \"status\": \"todo\" }" }, { "name": "403 Not Admin", "status": "Forbidden", "code": 403, "_postman_previewlanguage": "json", "body": "{ \"error\": \"Only admin can create tasks\" }" }]
+        },
+        {
+          "name": "Get Task by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/tasks/1/", "host": ["{{base_url}}"], "path": ["tasks", "1", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{ \"id\": 1, \"title\": \"Implement login page\", \"comments\": [] }" }]
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/tasks/1/", "host": ["{{base_url}}"], "path": ["tasks", "1", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"in_progress\",\n  \"assigned_to_id\": 3\n}" }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{ \"id\": 1, \"status\": \"in_progress\" }" }]
+        },
+        {
+          "name": "Update Task Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/tasks/update-status/", "host": ["{{base_url}}"], "path": ["tasks", "update-status", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"task_id\": 1,\n  \"status\": \"done\"\n}" }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{ \"id\": 1, \"status\": \"done\" }" }]
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/tasks/1/", "host": ["{{base_url}}"], "path": ["tasks", "1", ""] }
+          },
+          "response": [{ "name": "204 No Content", "status": "No Content", "code": 204, "_postman_previewlanguage": "json", "body": "" }]
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Get Comments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/tasks/1/comments/", "host": ["{{base_url}}"], "path": ["tasks", "1", "comments", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "[\n  {\n    \"id\": 1,\n    \"text\": \"Great work!\",\n    \"author\": { \"username\": \"mariya\" },\n    \"author_role\": \"admin\",\n    \"likes_count\": 2,\n    \"is_liked\": false\n  }\n]" }]
+        },
+        {
+          "name": "Add Comment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/tasks/1/comments/", "host": ["{{base_url}}"], "path": ["tasks", "1", "comments", ""] },
+            "body": { "mode": "raw", "raw": "{ \"text\": \"Great work! Please review.\" }" }
+          },
+          "response": [{ "name": "201 Created", "status": "Created", "code": 201, "_postman_previewlanguage": "json", "body": "{ \"id\": 1, \"text\": \"Great work!\", \"author\": { \"username\": \"mariya\" }, \"likes_count\": 0 }" }]
+        },
+        {
+          "name": "Delete Comment",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/tasks/1/comments/1/", "host": ["{{base_url}}"], "path": ["tasks", "1", "comments", "1", ""] }
+          },
+          "response": [{ "name": "204 No Content", "status": "No Content", "code": 204, "_postman_previewlanguage": "json", "body": "" }, { "name": "403 Not Author", "status": "Forbidden", "code": 403, "_postman_previewlanguage": "json", "body": "{ \"error\": \"You can only delete your own comments\" }" }]
+        },
+        {
+          "name": "Like / Unlike Comment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/comments/1/like/", "host": ["{{base_url}}"], "path": ["comments", "1", "like", ""] }
+          },
+          "response": [{ "name": "200 Liked", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{ \"liked\": true, \"likes_count\": 3 }" }, { "name": "200 Unliked", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{ \"liked\": false, \"likes_count\": 2 }" }]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/notifications/", "host": ["{{base_url}}"], "path": ["notifications", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "[\n  {\n    \"id\": 1,\n    \"type\": \"comment\",\n    \"message\": \"marmar commented on task\",\n    \"is_read\": false,\n    \"team_id\": 1,\n    \"task_id\": 1,\n    \"created_at\": \"2026-04-21T01:33:00Z\"\n  }\n]" }]
+        },
+        {
+          "name": "Get Notification Count",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/notifications/count/", "host": ["{{base_url}}"], "path": ["notifications", "count", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{ \"count\": 4 }" }]
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/notifications/", "host": ["{{base_url}}"], "path": ["notifications", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{ \"count\": 0 }" }]
+        },
+        {
+          "name": "Mark One as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/notifications/1/read/", "host": ["{{base_url}}"], "path": ["notifications", "1", "read", ""] }
+          },
+          "response": [{ "name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{ \"count\": 3 }" }]
+        }
+      ]
+    }
+  ]
+}
