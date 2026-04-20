@@ -9,6 +9,7 @@ class Subject(models.Model):
     semester = models.IntegerField(default=1)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subjects')
     created_at = models.DateTimeField(auto_now_add=True)
+    is_system = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.code} - {self.name}"
@@ -17,12 +18,28 @@ class Subject(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=100)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='teams')
-    members = models.ManyToManyField(User, related_name='teams', blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_teams')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
+
+
+class TeamMember(models.Model):
+    ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('member', 'Member'),
+    ]
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='memberships')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='memberships')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='member')
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['team', 'user']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.team.name} ({self.role})"
 
 
 class Task(models.Model):
@@ -63,3 +80,25 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.author} on {self.task}"
+    
+
+class Notification(models.Model):
+    TYPE_CHOICES = [
+        ('comment', 'New Comment'),
+        ('deadline', 'Deadline Soon'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    message = models.TextField()
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='notifications', null=True, blank=True)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='notifications', null=True, blank=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class CommentLike(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['comment', 'user']

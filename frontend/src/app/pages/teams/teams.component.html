@@ -1,0 +1,98 @@
+<div class="page-layout">
+  <app-navbar></app-navbar>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>My Teams</h1>
+    </div>
+
+    <div *ngIf="error" class="error-msg">{{ error }}</div>
+    <div *ngIf="success" class="success-msg">{{ success }}</div>
+
+    <div class="create-form">
+      <h3>Create New Team</h3>
+      <div class="form-row">
+        <input [(ngModel)]="newTeamName" placeholder="Team name" class="input-field" />
+        <select [(ngModel)]="selectedSubjectId" class="input-field">
+          <option value="" disabled>Select Subject</option>
+          @for (s of subjects; track s.id) {
+            <option [value]="s.id">{{ s.code }} - {{ s.name }}</option>
+          }
+        </select>
+        <button (click)="createTeam()" class="btn-primary">Create Team</button>
+      </div>
+    </div>
+
+    <div class="teams-grid">
+      @for (team of teams; track team.id) {
+        <div class="team-card">
+          <div class="team-info">
+            <h3>{{ team.name }}</h3>
+            <p>📚 {{ team.subject_name }}</p>
+            <p>👥 {{ team.member_count }}</p>
+          </div>
+          <div class="team-actions">
+            <a [routerLink]="['/teams', team.id]" class="btn-secondary">Open Board</a>
+            @if (isAdmin(team)) {
+              <button (click)="openMembers(team)" class="btn-members">Manage Members</button>
+              <button (click)="deleteTeam(team.id)" class="btn-danger">Delete</button>
+            }
+          </div>
+        </div>
+      }
+      @if (teams.length === 0) {
+        <div class="empty-container">
+          <p class="empty-state">No teams yet. Create one above!</p>
+        </div>
+      }
+    </div>
+  </main>
+</div>
+
+<div *ngIf="showMembersModal && selectedTeam" class="modal-overlay" (click)="closeMembers()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>👥 {{ selectedTeam.name }} — Members</h2>
+      <button (click)="closeMembers()" class="close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <h3>Current Members</h3>
+      <div class="members-list">
+        @for (m of selectedTeam.memberships; track m.id) {
+          <div class="member-item">
+            <span>👤 {{ m.user.username }}</span>
+            <span class="role-badge" [class.admin]="m.role === 'admin'">
+              {{ m.role === 'admin' ? 'Admin' : 'Member' }}
+            </span>
+            @if (m.role !== 'admin') {
+              <button (click)="removeMember(m.user.id)" class="btn-danger-sm">Remove</button>
+            }
+          </div>
+        }
+      </div>
+
+      <h3>Add Member</h3>
+      <div class="search-row">
+        <input
+          [(ngModel)]="searchQuery"
+          name="search"
+          placeholder="Search by username..."
+          class="input-field"
+          (input)="searchUsers()"
+        />
+      </div>
+
+      <div class="search-results">
+        @for (user of searchResults; track user.id) {
+          <div class="search-item">
+            <span>👤 {{ user.username }} ({{ user.first_name }} {{ user.last_name }})</span>
+            <button (click)="addMember(user.username)" class="btn-add">+ Add</button>
+          </div>
+        }
+        @if (searchQuery.length >= 2 && searchResults.length === 0) {
+          <p class="empty-state">No users found</p>
+        }
+      </div>
+    </div>
+  </div>
+</div>

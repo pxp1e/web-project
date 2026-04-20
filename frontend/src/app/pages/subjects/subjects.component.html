@@ -1,0 +1,49 @@
+<div class="page-layout">
+  <app-navbar></app-navbar>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Subjects</h1>
+    </div>
+
+    <div *ngIf="error" class="error-msg">{{ error }}</div>
+
+    <div class="create-form">
+      <h3>Add Subject</h3>
+      <div class="form-row">
+        <input [(ngModel)]="form.code" name="code" placeholder="Course code (e.g. CS301)" class="input-field" />
+        <input [(ngModel)]="form.name" name="name" placeholder="Subject name" class="input-field" />
+        <div class="semester-block">
+  <label class="semester-label">Semester</label>
+
+  <div class="semester-select">
+    @for (s of [1,2,3,4,5,6,7,8]; track s) {
+      <button
+        type="button"
+        (click)="form.semester = s"
+        [class.active]="form.semester === s">
+        {{ s }}
+      </button>
+    }
+  </div>
+</div>
+        <button (click)="createSubject()" class="btn-primary">Add</button>
+      </div>
+    </div>
+
+    <div class="subjects-list">
+      @for (sub of subjects; track sub.id) {
+        <div class="subject-card">
+          <div class="subject-info">
+            <strong>{{ sub.code }}</strong> — {{ sub.name }}
+            <span class="semester-badge">Semester {{ sub.semester }}</span>
+          </div>
+          <button (click)="deleteSubject(sub.id)" class="btn-danger">Remove</button>
+        </div>
+      }
+      @if (subjects.length === 0) {
+        <p class="empty-state">No subjects yet. Add one above!</p>
+      }
+    </div>
+  </main>
+</div>

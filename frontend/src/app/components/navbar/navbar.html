@@ -1,0 +1,16 @@
+<nav class="sidebar">
+  <div class="sidebar-logo">TaskBoard</div>
+  <ul class="nav-links">
+    <li><a routerLink="/dashboard">Dashboard</a></li>
+    <li><a routerLink="/teams">Teams</a></li>
+    <li><a routerLink="/subjects">Subjects</a></li>
+    <li><a routerLink="/notifications">Notifications
+      <span *ngIf="notificationCount > 0" class="notification-badge">{{ notificationCount }}</span>
+    </a></li>
+  </ul>
+
+  <div class="sidebar-bottom">
+    <span class="user-name">{{ user?.first_name || user?.username }}</span>
+    <button (click)="logout()" class="btn-logout">Logout</button>
+  </div>
+</nav>

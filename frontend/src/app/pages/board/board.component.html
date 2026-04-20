@@ -1,0 +1,164 @@
+<div class="page-layout">
+  <app-navbar></app-navbar>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Team Board</h1>
+      <a routerLink="/teams" class="btn-secondary">← Back to Teams</a>
+    </div>
+
+    <div class="create-task-form" *ngIf="isAdmin">
+      <h3>Create New Task</h3>
+      <div *ngIf="error" class="error-msg">{{ error }}</div>
+      <div>
+        <div class="form-row">
+          <input [(ngModel)]="newTask.title" name="title" placeholder="Task title" class="input-field" />
+          <div class="select-wrapper">
+            <label class="select-label">Priority</label>
+            <select [(ngModel)]="newTask.priority" name="priority" class="input-field select-small">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div class="select-wrapper">
+            <label class="select-label">Deadline</label>
+            <input [(ngModel)]="newTask.deadline" name="deadline" type="date" class="input-field select-small" />
+          </div>
+          <div class="select-wrapper">
+            <label class="select-label">Assign to</label>
+            <select [(ngModel)]="newTask.assigned_to_id" name="assigned_to" class="input-field select-small">
+              <option [ngValue]="null">No assignee</option>
+              @for (m of teamMembers; track m.id) {
+                <option [ngValue]="m.user.id">{{ m.user.username }}</option>
+              }
+            </select>
+          </div>
+          <button type="button" (click)="createTask()" class="btn-primary">+ Add Task</button>
+        </div>
+        <textarea [(ngModel)]="newTask.description" name="description" placeholder="Description (optional)" class="input-field textarea"></textarea>
+      </div>
+    </div>
+
+    <div class="kanban-board">
+      @for (col of columns; track col) {
+        <div class="kanban-column">
+          <div class="column-header">{{ columnLabels[col] }}</div>
+          <div class="column-tasks">
+            @for (task of getTasksByStatus(col); track task.id) {
+              <div class="task-card" (click)="openTask(task); $event.stopPropagation()">
+                <div class="task-title">{{ task.title }}</div>
+                <div class="task-meta">
+                  <span class="badge priority-{{ task.priority }}">{{ task.priority }}</span>
+                  <span *ngIf="task.deadline" class="deadline">📅 {{ task.deadline }}</span>
+                </div>
+                <div *ngIf="task.assigned_to" class="assigned">
+                  👤 {{ task.assigned_to.username }}
+                </div>
+                <div class="task-actions" (click)="$event.stopPropagation()">
+                  @if (isAdmin || task.assigned_to?.username === currentUser?.username) {
+                    @for (s of columns; track s) {
+                      @if (s !== col) {
+                        <button type="button" class="move-btn" (click)="moveTask(task, s)">→ {{ s }}</button>
+                      }
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </main>
+</div>
+
+<div *ngIf="showModal && selectedTask" class="modal-overlay" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-section">
+        <h2>{{ selectedTask.title }}</h2>
+        <div class="modal-badges">
+          <span class="badge status-{{ selectedTask.status }}">{{ selectedTask.status }}</span>
+          <span class="badge priority-{{ selectedTask.priority }}">{{ selectedTask.priority }}</span>
+        </div>
+      </div>
+      <button type="button" (click)="closeModal()" class="close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="task-info-grid">
+  <div class="task-info-item">
+    <span class="info-label">👤 Assigned to</span>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span class="info-value">{{ selectedTask.assigned_to?.username || 'Unassigned' }}</span>
+      @if (isAdmin) {
+        <select (change)="changeAssignee($event)" class="assignee-select">
+  <option value="">Change assignee...</option>
+  @for (m of teamMembers; track m.id) {
+    <option [value]="m.user.id">{{ m.user.username }}</option>
+  }
+</select>
+      }
+    </div>
+  </div>
+  <div class="task-info-item" *ngIf="selectedTask.deadline">
+    <span class="info-label">📅 Deadline</span>
+    <span class="info-value">{{ selectedTask.deadline }}</span>
+  </div>
+  <div class="task-info-item">
+    <span class="info-label">👤 Created by</span>
+    <span class="info-value">{{ selectedTask.created_by?.username }}</span>
+  </div>
+</div>
+
+      <div class="task-description">
+  <span class="info-label">Description</span>
+  <p>{{ selectedTask.description || 'No description' }}</p>
+</div>
+
+      <div class="comments-section">
+        <h3>💬 Comments ({{ selectedTask.comments.length }})</h3>
+        <div class="comments-list">
+          @for (comment of selectedTask.comments; track comment.id) {
+            <div class="comment">
+  <div class="comment-header">
+    <strong>{{ comment.author.username }}</strong>
+    <span class="comment-role-badge" [class.admin]="comment.author_role === 'admin'">
+      {{ comment.author_role === 'admin' ? 'Admin' : 'Member' }}
+    </span>
+    <span class="comment-time">{{ comment.created_at | date:'short' }}</span>
+    <button type="button" (click)="deleteComment(comment.id)" class="btn-delete-comment">🗑</button>
+  </div>
+  <span class="comment-text">{{ comment.text }}</span>
+  <div class="comment-footer">
+    <button type="button" (click)="likeComment(comment)" class="btn-like" [class.liked]="comment.is_liked">
+      {{ comment.is_liked ? '❤️' : '🤍' }} {{ comment.likes_count }}
+    </button>
+  </div>
+</div>
+          }
+          @if (selectedTask.comments.length === 0) {
+            <p class="empty-state">No comments yet — be the first!</p>
+          }
+        </div>
+
+        <div class="add-comment">
+          <textarea 
+            [(ngModel)]="newComment" 
+            name="newComment" 
+            placeholder="Write a comment..." 
+            class="input-field textarea"
+            (keydown.enter)="$event.stopPropagation()"
+></textarea>
+          <button type="button" (click)="addComment()" class="btn-comment">Post Comment</button>
+        </div>
+      </div>
+
+      @if (isAdmin) {
+        <div class="danger-zone">
+          <button type="button" (click)="deleteTask(selectedTask.id)" class="btn-danger">Delete Task</button>
+        </div>
+      }
+    </div>
+  </div>
+</div>
