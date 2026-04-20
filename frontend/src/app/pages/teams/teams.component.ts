@@ -65,14 +65,15 @@ export class TeamsComponent implements OnInit {
   }
 
   deleteTeam(id: number): void {
-    this.api.deleteTeam(id).subscribe({
-      next: () => {
-        this.teams = this.teams.filter(t => t.id !== id);
-        this.cdr.detectChanges();
-      },
-      error: () => this.error = 'Failed to delete team'
-    });
-  }
+  if (!confirm('Are you sure you want to delete this team?')) return;
+  this.api.deleteTeam(id).subscribe({
+    next: () => {
+      this.teams = this.teams.filter(t => t.id !== id);
+      this.cdr.detectChanges();
+    },
+    error: () => this.error = 'Failed to delete team'
+  });
+}
 
   isAdmin(team: any): boolean {
     return team.my_role === 'admin';
